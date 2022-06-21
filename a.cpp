@@ -86,7 +86,6 @@ int minimax(char jogador_atual, Board &board, int nivel) {
         }
     }
 
-    return possivel_minimo;
     //no final, decidir se retornamos o máximo ou o mínimo, dependendo de quem é o atual:
     if(jogador_atual == caracterePC) return possivel_minimo;
     else return possivel_maximo;
