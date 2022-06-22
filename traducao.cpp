@@ -2,7 +2,8 @@
 
 using namespace std;
 
-const char caracterePC = 'X';
+char caracterePC = 'X';
+char caractereUsuario = 'O';
 
 class Board {
     public:
@@ -20,6 +21,7 @@ class Board {
             }
             if(i < 2) cout << "\n------\n";
         }
+        cout << endl;
     }
 
     bool veri_movimento(int i, int j){
@@ -120,7 +122,7 @@ pair<int, int> minimax(Board &board, bool jogador, int &rodadas) {
             melhorValor = valor;
             melhorRodada = rodadas;
         }
-        else if(jogador == 0) {
+        else if(token == caracterePC) {
             if(melhorValor < valor) {
                 melhorValor = valor;
             }
@@ -165,9 +167,6 @@ pair<int, int> movimentoIA(Board &board, bool jogador) {
         //valor, rodadas = retorno
         board.values[linha][coluna] = ' ';
 
-        //cout << '{' << possibilidade.first << ", " << possibilidade.second << "} ";
-        //cout << jogador << " " << rodadas << endl;
-
         if(melhorValor < valor) {
             melhorValor = valor;
             melhorMovimento = possibilidade;
@@ -185,6 +184,13 @@ pair<int, int> movimentoIA(Board &board, bool jogador) {
     return melhorMovimento;
 }
 
+bool eh_digito(string &s) {
+    for(char c : s) 
+        if(!isdigit(c)) return false;
+    
+    return true;
+}
+
 int input_valido(string mensagem){
     int n;
     try{
@@ -192,7 +198,8 @@ int input_valido(string mensagem){
         cin >> n;
         if(n >= 1 && n <= 3){
             return n-1;
-        }else{
+        }
+        else{
             cout << "Numero deve estar entre 1 e 3" << endl;
             throw;
         }
@@ -202,50 +209,74 @@ int input_valido(string mensagem){
     }
 }
 
+void perguntar_comeco() {
+    string resposta;
+    cout << "Deseja começar primeiro? (S/N)\n";
+    cin >> resposta;
+    resposta[0] = toupper(resposta[0]);
+    while(resposta != "S" && resposta != "N") {
+        cout << "Deseja começar primeiro? (S/N)\n";
+        cin >> resposta;
+        resposta[0] = toupper(resposta[0]);
+    }
+
+    if(resposta == "S") swap(caracterePC, caractereUsuario);
+}
+
+void computador_joga(Board &board) {
+    int i, j;
+    pair<int, int> melhorJogada = movimentoIA(board, 0);
+    i = melhorJogada.first;
+    j = melhorJogada.second;
+    board.movimento(i, j, caracterePC);
+}
+
 int main(){
     Board board(' ');
     board.printa_board();
+    //perguntar quem começa
+    perguntar_comeco();
 
     int turno = 0;
-    char caracter;
     bool ganhador = false;
-    while(!ganhador){
-        if(turno == 9){
-            caracter = 'E';
-            break;
-        }else if(turno % 2 == 0){
-            caracter = 'X';
-        }else if(turno % 2 != 0){
-            caracter = 'O';
-        }
+    while(!ganhador && turno < 9){
+        char caracter;
+        if(turno % 2 == 0) caracter = 'X';
+        else caracter = 'O';
 
-        cout << "\nVez do : " << caracter << endl;
-        int i, j;
-        if(turno % 2 != 0)  {
-            i = input_valido("Digite a linha: ");
-            j = input_valido("Digite a coluna: ");
+        if(caracter == caracterePC)
+            cout << "Máquina joga" << endl;
+        else cout << "Você joga" << endl;
+        
+        if(caracter == caracterePC)
+            computador_joga(board);
+        else if(caracter == caractereUsuario) {
+            int i = input_valido("Digite a linha: ");
+            int j = input_valido("Digite a coluna: ");
 
             if(board.veri_movimento(i, j)) {
                 board.movimento(i, j, caracter);
             }
-            else continue;
+            else {
+                cout << "Jogada inválida, tente novamente" << endl;
+                continue;
+            }
+        }
 
-        }
-        else {
-            pair<int, int> melhorJogada = movimentoIA(board, 0);
-            i = melhorJogada.first;
-            j = melhorJogada.second;
-            board.movimento(i, j, caracterePC);
-        }
         ganhador = board.veri_vitoria(caracter);
         turno++;
         board.printa_board();
     }
 
-    if(caracter == 'E'){
+    if(board.veri_vitoria(caracterePC) == 0) {
         cout << "Empatou" << endl;
-    }else{
-        cout << "O ganhador foi: " << caracter << endl;
     }
+    else if(board.veri_vitoria(caracterePC) == 0) {
+        cout << "O computador ganhou!" << endl;
+    }
+    else {
+        cout << "Você ganhou!" << endl;
+    }
+
     return 0;
 }
