@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -75,8 +76,6 @@ class Board {
     }
 };
 
-/*
-*/
 vector<pair<int, int>> posicoes(Board &board) {
     vector<vector<char>> &values = board.values;
     vector<pair<int, int>> retorno;
@@ -102,7 +101,6 @@ pair<int, int> minimax(Board &board, bool jogador, int &rodadas) {
     if(jogador == 1) token = 'O';
     //char token = (jogador == 1) ? 'O' : 'X';
 
-
     vector<pair<int, int>> possibilidades = posicoes(board);
     int melhorValor = INT_MIN;
     int melhorRodada = INT_MAX;
@@ -112,7 +110,6 @@ pair<int, int> minimax(Board &board, bool jogador, int &rodadas) {
         linha = possibilidade.first;
         coluna = possibilidade.second;
         //char token = (jogador == 1) ? 'O' : 'X';
-
         
         board.values[linha][coluna] = token;
         pair<int, int> retorno_filho = minimax(board, jogador, rodadas);
@@ -176,7 +173,7 @@ pair<int, int> movimentoIA(Board &board, bool jogador) {
             melhorMovimento = possibilidade;
         }
 
-        cout << possibilidade.first << " " << possibilidade.second << " " << valor << " " << rodadas << endl;
+        cout << "i: " <<possibilidade.first << " j: "  << possibilidade.second << " " << valor << " " << rodadas << endl;
     }
 
     cout << melhorValor << endl;
@@ -225,7 +222,9 @@ void perguntar_comeco() {
 
 void computador_joga(Board &board) {
     int i, j;
-    pair<int, int> melhorJogada = movimentoIA(board, 0);
+    int jogador = 0;
+    if(caracterePC == 'O') jogador = 1;
+    pair<int, int> melhorJogada = movimentoIA(board, jogador);
     i = melhorJogada.first;
     j = melhorJogada.second;
     board.movimento(i, j, caracterePC);
@@ -268,14 +267,14 @@ int main(){
         board.printa_board();
     }
 
-    if(board.veri_vitoria(caracterePC) == 0) {
-        cout << "Empatou" << endl;
+    if(board.veri_vitoria(caractereUsuario)) {
+        cout << "Voce ganhou!" << endl;
     }
-    else if(board.veri_vitoria(caracterePC) == 0) {
+    else if(board.veri_vitoria(caracterePC)) {
         cout << "O computador ganhou!" << endl;
     }
     else {
-        cout << "Você ganhou!" << endl;
+        cout << "Empate!" << endl;
     }
 
     return 0;
